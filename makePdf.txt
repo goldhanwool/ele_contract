@@ -1,0 +1,54 @@
+import { Inject, Injectable } from '@nestjs/common';
+import axios from 'axios';
+import { writer } from 'repl';
+import hbs from 'hbs';
+import { moveMessagePortToContext } from 'worker_threads';
+
+const puppeteer = require('puppeteer');
+const fs = require('fs-extra');
+const path = require('path');
+const pug = require('pug');
+// const fileUrl = require("file-url");
+const { exit } = require('process');
+const moment = require('moment');
+
+
+@Injectable()
+export class AppService {
+  constructor() {}
+
+  const compile = async function(templateName, data) {
+    const filePath = path.join(process.cwd(), 'templates', `${templateName}.hbs`)
+    const html = await fs.readFile(filePath, 'utf-8');
+    return hbs.compile(html)(data);
+  };
+
+  // hbs.registerHelper('dateFormat', function(value, format){
+  //   return moment(value).format(format)
+  // }); 
+
+  // async makePdf() {
+  //   try {
+  //     const browser = await puppeteer.launch();
+  //     const page = await browser.newPage();
+
+  //     console.log(data);
+  //     const content = compile('index', data);
+
+  //     await page.setContent(content);
+  //     await page.emulateMedia('screen');
+  //     await page.pdf({
+  //       path: 'test.pdf',
+  //       format: 'A4',
+  //       printBackground: true,
+  //     });
+  //     console.log('done');
+  //     await browser.close();
+  //     process.exit();
+  //   } catch (e) {
+  //     console.log('error', e);
+  //   }
+  // }
+
+
+} //service

@@ -1,0 +1,186 @@
+//- src/estimate.pug
+include base-print.pug
+
+- 
+  /** 
+    * @typedef {Object} EstimateContentRow
+    * @property {string} type 구분
+    * @property {string} name 품명
+    * @property {string} standard 규격
+    * @property {string} count 수량
+    * @property {string} unitCostCommaed 단가
+    * @property {string} suppliedCostCommaed 공급가액
+    * @property {string} etc 비고
+    */
+
+  /** 
+    * @typedef {Object} EstimateContent
+    * @property {EstimateContentRow} 1 1번째 행
+    * @property {EstimateContentRow} 2 2번째 행
+    * @property {EstimateContentRow} 3 3번째 행
+    * @property {EstimateContentRow} 4 4번째 행
+    * @property {EstimateContentRow} 5 5번째 행
+    * @property {EstimateContentRow} 6 6번째 행
+    * @property {EstimateContentRow} 7 7번째 행
+    * @property {EstimateContentRow} 8 8번째 행
+    * @property {EstimateContentRow} 9 9번째 행
+    * @property {EstimateContentRow} 10 10번째 행
+    * @property {EstimateContentRow} 11 11번째 행
+    */
+  
+  /**
+    * @typedef {Object} PrintEstimateArgs
+    * @property {string} dateString 날짜 
+    * @property {string} repicientCompanyName 날짜 
+    * @property {string} companyPlace 사업장 소재지
+    * @property {string} chiefName 대표자 성명
+    * @property {string} chiefPhone 대표자 전화번호
+    * @property {string} totalPriceHangul 총 금액 한글표기
+    * @property {string} totalPriceCommaed 총 금액 쉼표포맷팅 (예: 20,000)
+    * @property {EstimateContent} estimateContent 본문 내용
+    * @property {string} suppliedCostSumCommaed 공급가액 합계 (예: 120,000)
+    */
+
+- 
+  const sl = [
+    {
+      title: '날짜',
+      content: dateString,
+    },
+    {
+      title: '수신',
+      content: companyPlace
+    },
+    {
+      title: '참조',
+      content: ''
+    },
+  ]
+  
+  const estimateContentWrapper = {
+    1: {},
+    2: {},
+    3: {},
+    4: {},
+    5: {},
+    6: {},
+    7: {},
+    8: {},
+    9: {},
+    10: {},
+    11: {},
+    ...estimateContent
+  }
+
+- 
+  const sr = [
+    {
+      title: '사업장 소재지',
+      content: companyPlace
+    },
+    {
+      title: '상호',
+      content: '가나다라 회사'
+    },
+    {
+      title: '사업자등록번호',
+      content: 'xxx-xx-xxxxx', 
+    },
+    {
+      title: '대표자 성명',
+      content: `${chiefName}     (인)`,
+    },
+    {
+      title: '전화번호',
+      content: chiefPhone,
+    },
+  ]
+
+
++printWrapper
+  style.
+    .-m-1px {
+      margin-left: -1px;
+      margin-top: -1px;
+    }
+    .table {
+      display: grid;
+      grid-template-columns: 5fr 10fr 18fr 5fr 5fr 10fr 10fr 10fr;
+      grid-template-rows: repeat(17, 1fr) 4fr;
+    }
+    .table div {
+      border: 1px solid #000;
+      padding: 5px;
+      margin-left: -1px;
+      margin-top: -1px;
+    }
+
+  - centerClass = ["flex", "items-center", "place-content-center"]
+
+  mixin spans(text)
+    - split = text.split('')
+    each ch, index in split
+      span #{ch}
+
+  mixin center
+    .flex.items-center.place-content-center&attributes(attributes)
+      block
+  
+  h1.text-3xl.text-center.mb-16 계 &nbsp; &nbsp; 약 &nbsp; &nbsp; 서
+  .mb-5.flex.justify-between
+    .flex-0.mr-20
+      each val, index in sl
+        .flex.border-b.border-gray-800.p-2
+          .flex-0.w-14.flex.items-center #{val.title}
+          .flex-0.w-40.text-right #{val.content}
+    .flex-0
+      each val, index in sr
+        .flex
+          .flex-0.w-32.-m-1px.border.border-gray-800.font-bold.px-2.py-1.flex.items-center #{val.title}
+          .flex-0.w-60.-m-1px.border.border-gray-800.px-2.py-1 #{val.content}
+  p.mb-10 아래와 같이 견적합니다.
+  .table.ml-1
+    .col-span-2.row-span-2.bg-gray-100.font-bold.text-center(class=[...centerClass]) 합계금액<br>(공급가액 + 세액)
+    .col-span-6.row-span-2.text-xl.font-bold(class=[...centerClass]) #{totalPriceHangul || '오십오만원정'} (₩ #{totalPriceCommaed || '550,000'})
+    .bg-gray-100.font-bold(class=[...centerClass]) No.
+    .bg-gray-100.font-bold(class=[...centerClass]) 구분
+    .bg-gray-100.font-bold(class=[...centerClass]) 품 명
+    .bg-gray-100.font-bold(class=[...centerClass]) 규격
+    .bg-gray-100.font-bold(class=[...centerClass]) 수량
+    .bg-gray-100.font-bold(class=[...centerClass]) 단가
+    .bg-gray-100.font-bold(class=[...centerClass]) 공급가액
+    .bg-gray-100.font-bold(class=[...centerClass]) 비고
+    each row, num in estimateContentWrapper
+      div(class=[...centerClass]) #{num}
+      div(class=[...centerClass]) #{row.type}
+      div(class=[...centerClass]) #{row.name}
+      div(class=[...centerClass]) #{row.standard}
+      div(class=[...centerClass]) #{row.count}
+      .flex.justify-between 
+        if row.unitCostCommaed
+          span ₩
+          span #{row.unitCostCommaed}
+      .flex.justify-between 
+        if row.suppliedCostCommaed
+          span ₩
+          span #{row.suppliedCostCommaed}
+      div(class=[...centerClass]) #{row.etc}
+    .col-span-6.flex(class=[...centerClass]) 
+      p.w-24.flex.justify-between
+        +spans('관리비')
+    div
+    div 
+    .col-span-6.flex(class=[...centerClass]) 
+      p.w-24.flex.justify-between
+        +spans('기업이윤')
+    div
+    div
+    .col-span-6.bg-gray-100.font-bold(class=[...centerClass])
+      p.w-24.flex.justify-between
+        +spans('합계')
+    .flex.justify-between.bg-gray-100
+      if suppliedCostSumCommaed
+        span ₩
+        span #{suppliedCostSumCommaed}
+    .bg-gray-100(class=[...centerClass]) 부가세 별도
+    .col-span-8.row-span-4 [MEMO]

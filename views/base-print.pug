@@ -1,0 +1,24 @@
+mixin printWrapper
+  html(lang="ko")
+    head
+      meta(charset="UTF-8")
+      meta(name="viewport" content="width=device-width, initial-scale=1.0")
+      title PRINT HTML
+      link(href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet")
+      link(href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet")
+      
+    body
+      style.
+        @page {
+          size: A4;
+          margin: 70pt 60pt 70pt;
+        }
+        body {
+          font-size: 10pt;
+          font-family: 'Noto Sans KR', Arial, Helvetica, sans-serif;
+          -webkit-print-color-adjust: exact;
+          line-height: 1.5;
+        }
+        
+      .main 
+        block

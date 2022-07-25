@@ -1,0 +1,134 @@
+  async createPDF() {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+
+    const htmlName = Date.now();
+    const compile = pug.compileFile(
+      path.join(__dirname, '..', 'views', 'pugfile.pug'),
+    );
+    const html = compile({
+      dateString: '2022-06-20',
+      repicientCompanyName: '폐기물 다치워',
+      companyPlace: '진천군 수거자',
+      chiefName: '수거자',
+      chiefPhone: '010-1234-5678',
+      totalPriceHangul: '육십육만원정',
+      totalPriceCommaed: '660,000',
+      estimateContent: {
+        2: {
+          type: '상품',
+          name: '건축자재',
+          standard: '-',
+          count: '1EA',
+          unitCostCommaed: '600,000',
+          suppliedCostCommaed: '600,000',
+          etc: '',
+        },
+      },
+      suppliedCostSumCommaed: '',
+    });
+
+    const htmlPath = path.resolve(__dirname, '..', 'views', `${htmlName}.hbs`);
+    console.log('htmlPath : ');
+    console.log(htmlPath);
+    fs.promises.writeFile(htmlPath, html);
+    const htmluri =
+      'file://' + path.resolve(__dirname, '..', 'views', `${htmlName}.hbs`);
+    console.log('htmluri : ');
+    console.log(htmluri);
+    const page = await browser.newPage();
+    await page.goto(htmluri, {
+      waitUntil: 'networkidle0',
+    });
+    console.log('page: ');
+    console.log(JSON.stringify(page));
+
+    // const pdf = await page.pdf({ format: 'a4' });
+    // await browser.close();
+    // // return this.printPDF(pdf, htmlName);
+    // return '성공';
+  }
+
+  async test() {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
+
+    const htmlName = Date.now();
+    const htmlPath = path.resolve(__dirname, '..', 'views', 'index.html');
+    console.log('htmlPath : ');
+    const html = fs.readFile('./views/index.html', (err, data) => {
+      if (err) throw err;
+      console.log('파일읽기');
+    });
+    console.log(html);
+    fs.promises.writeFile(htmlPath, html);
+    console.log(htmlPath);
+    // const htmluri =
+    //   'file://' + path.resolve(__dirname, '..', 'views', `${htmlName}.html`);
+    // console.log('htmluri : ');
+    // console.log(htmluri);
+
+    // const html = fs.readFile(htmlPath, function (err, data) {
+    //   console.log(data);
+    // });
+
+    // const html = { messag: 'data' };
+    // fs.promises.writeFile(htmlPath, html);
+
+    // const page = await browser.newPage();
+    // await page.goto(htmluri, {
+    //   waitUntil: 'networkidle0',
+    // });
+    // console.log('page: ');
+    // console.log(JSON.stringify(page));
+    // const pdf = await page.pdf({ format: 'a4' });
+    // await browser.close();
+    // return this.printPDF(pdf, htmlName);
+
+    // return { html };
+  }
+
+  async printPDF(pdf, htmlName) {
+    console.log('pdf');
+    // console.log(pdf)
+    const buf = pdf;
+    // path.join(`/home/goldhanwool/workspace/chium/venv_chium_back_nestjs/chium_back_nestjs/src/modules/contract/output/${htmlName}.pdf`));
+    const writer = await fs.createWriteStream(
+      path.join(__dirname, '..', 'views', `${htmlName}.pdf`),
+    );
+    await writer.write(buf);
+    writer.end();
+
+    // writer['fieldname'] = 'document';
+    // writer['originalname'] = `${htmlName}.pdf`;
+    // writer['buffer'] = writer['_writableState']['buffered'][0]['chunk'];
+    // writer['mimetype'] = 'application/pdf';
+    // writer['size'] = 0;
+    // writer['encoding'] = '7bit';
+    // console.log(writer);
+
+    // const result = await this.awsService.uploadFileToS3('test', writer);
+    // await this.cancleFile(htmlName);
+    // return result;
+  }
+
+  async cancleFile(htmlName) {
+    console.log('파일삭제시도');
+    //파일삭제 => fs.unlink
+    fs.unlink(
+      path.join(__dirname, '..', 'output', `${htmlName}.pdf`),
+      function (err) {
+        if (err === null) {
+          console.log('success');
+          return 'success';
+        } else {
+          return 'fail';
+        }
+      },
+    );
+    console.log('파일삭제마지막');
+  }
